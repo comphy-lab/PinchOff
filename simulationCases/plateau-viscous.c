@@ -89,16 +89,16 @@ int main()
   /**
   We consider the inviscid case. Viscosity could be added easily with
   something like: */
-  
-  // mu1 = ..., mu2 = ...;
-  
+
+  mu1 = 1e-2, mu2 = 1e-4;
+
   run();
 }
 
 /**
 The initial conditions are a perturbed cylinder with a relatively
 large amplitude of deformation (10%). */
-  
+
 event init (t = 0) {
   double k = pi, R = 0.2;
   fraction (f, R*(1. + 0.1*sin(k*x)) - y);
@@ -160,7 +160,7 @@ event adapt (i++)
 
   /**
   We check whether the column is broken. */
-  
+
   position (f, Y, {0,1});
   static bool broken = false;
   if (!broken)
@@ -177,7 +177,7 @@ event adapt (i++)
   /**
   Cells which do not contain the interface (or which are at a level
   larger than 10 after breakup) are "unrefined". */
-  
+
   unrefine (f[] <= eps || f[] >= 1. - eps ||
 	    (broken && level > 10));
 }
