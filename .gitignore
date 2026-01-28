@@ -1,4 +1,7 @@
 # basililsk specific files
+basilisk/
+CLAUDE.md
+.project_config
 **/*.DS_Store
 **/intermediate*
 **/log*.dat
@@ -11,6 +14,10 @@
 **/*.mp4
 **/*.json
 **/*.bv
+
+# Simulation outputs
+simulationCases/**/log
+simulationCases/**/prof-*
 
 # Custom executables (add your specific executable names here)
 filamentsVE

@@ -1,2 +1,0 @@
-export BASILISK=/Users/vatsal/Documents/1-github/sandboxPlayGround/PinchOff/basilisk/src
-export PATH=$PATH:$BASILISK
