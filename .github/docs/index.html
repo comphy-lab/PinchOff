@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <!-- 
+    IMPORTANT: DO NOT place empty anchor tags <a></a> in this template!
+    They cause JavaScript syntax errors when they appear inside script blocks.
+  -->
+  <!-- Eliminate FOUC (Flash of Unstyled Content) and FOUT (Flash of Incorrect Theme) -->
+  <script>
+    (function() {
+  try {
+    // Apply the theme as quickly as possible to avoid flash
+    let saved;
+    try {
+      saved = localStorage.getItem('theme');
+    } catch (storageError) {
+      // Handle localStorage access errors (private browsing, cookies disabled)
+      console.warn('Unable to access localStorage:', storageError);
+    }
+
+    let prefersDark = false;
+    try {
+      prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch (mediaError) {
+      // Handle matchMedia access errors (unsupported browsers)
+      console.warn('Unable to check media query:', mediaError);
+    }
+
+    const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    // Add theme class for CSS targeting
+    document.documentElement.classList.add(theme + '-theme');
+    // Mark when theme is set for CSS transitions
+    document.documentElement.classList.add('theme-set');
+  } catch (error) {
+    // Fallback for any other unexpected errors
+    console.warn('Theme initialization failed:', error);
+    // Apply default theme as fallback
+    try {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.add('theme-set');
+    } catch (fallbackError) {
+      // Silent catch for extreme cases
+      console.error('Critical theme fallback failed:', fallbackError);
+    }
+  }
+})();
+  </script>
+
+
+  <!-- No-JS fallback for theme and critical theming styles -->
+  <style>
+    /* Default light theme variables */
+    :root {
+      /* Base colors */
+      --color-background: #fff;
+      --color-text: #333;
+      --color-primary: #0066cc;
+      --color-secondary: #036;
+      --color-accent: #0099ff;
+      
+      /* UI elements */
+      --color-header-bg: #f5f5f5;
+      --color-footer-bg: #2d2e33;
+      --color-border: #e0e0e0;
+      --color-input-bg: #f9f9f9;
+      
+      /* Component colors */
+      --color-preloader-bg: #ffffff;
+      --color-loader: #0066cc;
+      --color-card-bg: #ffffff;
+      --color-code-bg: #f5f5f5;
+    }
+    
+    /* Dark theme variables applied via media query when JS is disabled */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.theme-set) {
+        /* Base colors - dark mode */
+        --color-background: #1a1a1a;
+        --color-text: #f5f5f5;
+        --color-primary: #4d9fff;
+        --color-secondary: #88ccff;
+        --color-accent: #00bfff;
+        
+        /* UI elements - dark mode */
+        --color-header-bg: #121212;
+        --color-footer-bg: #121212;
+        --color-border: #333;
+        --color-input-bg: #2d2d2d;
+        
+        /* Component colors - dark mode */
+        --color-preloader-bg: #1a1a1a;
+        --color-loader: #4d9fff;
+        --color-card-bg: #222;
+        --color-code-bg: #2d2d2d;
+      }
+    }
+    
+    /* When JS sets the theme explicitly via data attribute */
+    [data-theme="dark"] {
+      /* Base colors - dark mode */
+      --color-background: #1a1a1a;
+      --color-text: #f5f5f5;
+      --color-primary: #4d9fff;
+      --color-secondary: #88ccff;
+      --color-accent: #00bfff;
+      
+      /* UI elements - dark mode */
+      --color-header-bg: #121212;
+      --color-footer-bg: #121212;
+      --color-border: #333;
+      --color-input-bg: #2d2d2d;
+      
+      /* Component colors - dark mode */
+      --color-preloader-bg: #1a1a1a;
+      --color-loader: #4d9fff;
+      --color-card-bg: #222;
+      --color-code-bg: #2d2d2d;
+    }
+    
+    /* Prevent transition flashes during initial load */
+    html:not(.transitions-enabled) * {
+      transition: none !important;
+    }
+    
+    /* Apply theme to preloader and early elements */
+    #preloader {
+      background-color: var(--color-preloader-bg);
+      color: var(--color-text);
+    }
+    
+    #loader {
+      border-color: var(--color-loader);
+      border-top-color: transparent;
+    }
+    
+    /* Noscript warning */
+    .noscript-warning {
+      background-color: var(--color-primary);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+    
+    /* Theme indicator for no-JS */
+    .theme-indicator {
+      padding: 5px 10px;
+      border-radius: 4px;
+      background-color: var(--color-input-bg);
+      color: var(--color-text);
+      text-align: center;
+    }
+    
+    /* Hide JS-only elements when no JS */
+    .no-js .js-only {
+      display: none !important;
+    }
+    
+    /* Show no-JS alternatives */
+    .js .no-js-only {
+      display: none !important;
+    }
+  </style>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="base-url" content="..">
+  <title>PinchOff: Plateau-Rayleigh Pinch-Off in Basilisk | PinchOff: Plateau-Rayleigh Pinch-Off in Basilisk</title>
+  
+  <!-- Critical CSS for fastest paint -->
+  <style>
+      .s-intro__title {
+          visibility: visible;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      .s-header {
+          visibility: visible;
+      }
+      
+      /* Ensure theme toggle properly styled immediately */
+      .theme-toggle {
+          background-color: var(--color-background);
+          color: var(--color-text);
+      }
+      
+      /* Control SVG visibility based on theme */
+      [data-theme="dark"] .theme-toggle-icon.sun,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.moon {
+          display: block;
+      }
+      
+      [data-theme="dark"] .theme-toggle-icon.moon,
+      :root:not([data-theme="dark"]) .theme-toggle-icon.sun {
+          display: none;
+      }
+  </style>
+
+  <!-- Critical Meta Tags -->
+  <meta name="description" content="Computational fluid dynamics simulations using Basilisk C framework.">
+  <meta name="author" content="CoMPhy Lab">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="fluid dynamics, CFD, Basilisk, multiphase flow, computational physics">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="CoMPhy Lab">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="./assets/js/main.js" as="script">
+  <link rel="preload" href="./assets/css/fontello/css/fontello.css" as="style">
+  <link rel="preload" href="./assets/css/academicons-1.7.0/css/academicons.min.css" as="style">
+
+  <!-- Base stylesheets -->
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <link rel="stylesheet" href="./assets/css/custom_styles.css">
+  <link rel="stylesheet" href="./assets/css/command-palette.css">
+  <link rel="stylesheet" href="./assets/css/fontello/css/fontello.css">
+  <link rel="stylesheet" href="./assets/css/academicons-1.7.0/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Font optimization -->
+  <style>
+      @font-face {
+          font-display: swap;
+          font-family: 'System Font';
+          src: local('system-ui');
+      }
+  </style>
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="./assets/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg">
+  <link rel="shortcut icon" href="./assets/favicon/favicon.ico">
+  <link rel="manifest" href="./assets/favicon/site.webmanifest">
+
+  <!-- Scripts with proper loading attributes -->
+  <script src="./assets/js/jquery.min.js"></script>
+  <script src="./assets/js/jquery-ui.packed.js"></script>
+  <script src="./assets/js/plots.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <!-- Config script must load before other scripts -->
+  <script src="./assets/js/config.js"></script>
+  <script defer src="./assets/js/html-sanitizer.js"></script>
+  <script defer src="./assets/js/search-helper.js"></script>
+  <script defer src="./assets/js/command-palette.js"></script>
+  <script defer src="./assets/js/command-data.js"></script>
+  <script defer src="./assets/js/main.js"></script>
+  <script defer src="./assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+  
+  <!-- Optimize page load performance -->
+  <script>
+    // Preconnect to critical domains
+    const preconnectDomains = [
+      'https://cdnjs.cloudflare.com',
+      'https://cdn.jsdelivr.net'
+    ];
+    
+    preconnectDomains.forEach(domain => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = domain;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+      
+      // Also add DNS prefetch as fallback
+      const dnsLink = document.createElement('link');
+      dnsLink.rel = 'dns-prefetch';
+      dnsLink.href = domain;
+      document.head.appendChild(dnsLink);
+    });
+    
+    // Detect when document is fully loaded to remove preloader
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 300); // Match transition duration
+      }
+    });
+  </script>
+
+  <script>
+      // Load Font Awesome with proper environment detection and fallbacks
+      function loadStylesheet(href) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.crossOrigin = 'anonymous';
+        link.onerror = (e) => {
+          console.error(`Failed to load stylesheet: `, e);
+          console.log('Trying alternative Font Awesome source...');
+        };
+        document.head.appendChild(link);
+        return link;
+      }
+      
+      // Check if we're on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Use hardcoded version numbers for reliable loading
+        
+        // Load Font Awesome using multiple CDNs to maximize reliability for local development
+        loadStylesheet('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+        // Backup CDN if the first one fails
+        loadStylesheet('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css');
+        // Final local fallback - ensures it will work on any localhost environment
+        loadStylesheet('https://use.fontawesome.com/releases/v6.7.2/css/all.css');
+      } else {
+        // Use Kit for production with defer
+        var script = document.createElement('script');
+        script.src = 'https://kit.fontawesome.com/b1cfd9ca75.js';
+        script.crossOrigin = 'anonymous';
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    </script>
+
+  <script>
+      // Mark page as JS-enabled and manage transitions
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+      
+      // Allow CSS transitions after initial load to prevent transition flashes
+      window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => {
+              document.documentElement.classList.add('transitions-enabled');
+          }, 100); // Short delay to ensure DOM is ready
+      });
+  </script>
+</head>
+<body id="top">
+<script>
+window.repoName = "PinchOff";
+window.githubOrg = "comphy-lab";
+window.baseDomain = "https://comphy-lab.org/PinchOff";
+</script>
+
+
+    <!-- Preloader with theme variables applied -->
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
+    <noscript>
+        <div class="noscript-warning">
+            <p>This site works best with JavaScript enabled. Some features may be limited.</p>
+        </div>
+    </noscript>
+
+    <div id="page" class="s-pagewrap">
+        <header class="s-header">
+            <div class="s-header__logo">
+                <a class="logo" href="/">
+                    <img src="./assets/logos/CoMPhy-Lab-no-name.png" alt="CoMPhy Lab">
+                </a>
+                <a class="documentation-button" href="/PinchOff">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>PinchOff</span>
+                </a>
+            </div>
+            <a class="s-header__menu-toggle" href="#0">
+                <span class="s-header__menu-text">Menu</span>
+                <span class="s-header__menu-icon"></span>
+            </a>
+            <nav class="s-header__nav">
+                <a href="#0" class="s-header__nav-close-btn"><span>Close</span></a>
+                <ul class="s-header__nav-list">
+                    <li style="background: none;">
+                        <!-- JS theme toggle -->
+                        <div class="theme-toggle js-only" id="theme-toggle" aria-label="Toggle dark/light theme">
+                            <svg class="theme-toggle-icon moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <svg class="theme-toggle-icon sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </div>
+                    </li>
+                    <!-- NOTE: The following links are organization-specific. Customize for your organization. -->
+                    <li style="background: none;"><a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" style="background: none; padding: 0;" aria-label="Google Scholar Profile"><i class="ai ai-google-scholar" style="font-size: 1.75em;"></i></a></li>
+                    <li style="background: none;"><a href="https://github.com/comphy-lab" style="background: none; padding: 0;" aria-label="GitHub Organization"><i class="fa-brands fa-github" style="font-size: 1.75em"></i></a></li>
+                    <li><a href="https://comphy-lab.org/#about" class="smoothscroll">About</a></li>
+                    <li><a href="https://comphy-lab.org/team/">Team</a></li>
+                    <li><a href="https://comphy-lab.org/research">Research</a></li>
+                    <li><a href="https://comphy-lab.org/teaching">Teaching</a></li>
+                    <li><a href="https://comphy-lab.org/join">Join Us</a></li>
+                    <li><a href="https://blogs.comphy-lab.org/">Blog</a></li>
+                    <li style="background: none;"><a href="https://bsky.app/profile/comphy-lab.org" style="background: none; padding: 0;" aria-label="Bluesky Profile"><i class="fa-brands fa-bluesky" style="font-size: 1.75em; color: #0085ff;"></i></a></li>
+                    <!-- Command Palette Button (Styled like search) -->
+                    <li class="command-palette-button">
+                        <div class="command-wrapper">
+                            <button class="command-k-style-btn" id="command-palette-btn" aria-label="Open command palette">
+                                <span class="default-theme-text">ctrl K</span>
+                                <span class="mac-theme-text">⌘ K</span>
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main content -->
+        <main class="content">
+            
+            <div class="page-content">
+                
+                                
+                                
+                
+                <h1
+                id="pinchoff-plateau-rayleigh-pinch-off-in-basilisk">PinchOff:
+                Plateau-Rayleigh Pinch-Off in Basilisk</h1>
+                <p><a href="http://basilisk.fr"><img
+                src="https://img.shields.io/badge/Basilisk-C-blue"
+                alt="Basilisk" /></a></p>
+                <h2 id="overview">Overview</h2>
+                <p>PinchOff contains axisymmetric two-phase VOF
+                simulations of the Rayleigh-Plateau instability and
+                pinch-off scaling of a liquid cylinder. The cases
+                reproduce the similarity laws <span
+                class="math inline">\(r_{min} \sim (t_0 -
+                t)^{2/3}\)</span> and <span
+                class="math inline">\(u_{max} \sim (t_0 -
+                t)^{-1/3}\)</span> using adaptive mesh refinement and
+                interface tracking. Two variants are provided: an
+                inviscid setup (<code>plateau-basilisk-website.c</code>)
+                and a viscous setup
+                (<code>plateau-viscous.c</code>).</p>
+                <p>Background references: Popinet (2009) and Popinet
+                &amp; Antkowiak (2011).</p>
+                <h2 id="physics">Physics</h2>
+                <h3 id="problem-description">Problem Description</h3>
+                <p>A liquid cylinder of radius <span
+                class="math inline">\(R = 0.2\)</span> is perturbed by a
+                sinusoidal mode with wavenumber <span
+                class="math inline">\(k = \pi\)</span> and amplitude
+                <span class="math inline">\(A = 0.1\)</span> in an
+                axisymmetric domain. Surface tension drives the
+                Rayleigh-Plateau instability, leading to necking,
+                pinch-off, and satellite drop formation. The interface
+                is tracked with a VOF field, and the mesh is refined to
+                keep at least five cells across the local radius up to
+                <code>maxlevel = 18</code>.</p>
+                <h3 id="governing-equations">Governing Equations</h3>
+                <p>The solver integrates the axisymmetric incompressible
+                Navier-Stokes equations for two phases with surface
+                tension:</p>
+                <p><span class="math display">\[\nabla \cdot \mathbf{u}
+                = 0\]</span></p>
+                <p><span class="math display">\[\rho\left(\frac{\partial
+                \mathbf{u}}{\partial t} + \mathbf{u} \cdot \nabla
+                \mathbf{u}\right) = -\nabla p + \nabla \cdot (2\mu
+                \mathbf{D}) + \sigma \kappa \delta_s
+                \mathbf{n}\]</span></p>
+                <p>The VOF field <span class="math inline">\(f\)</span>
+                satisfies:</p>
+                <p><span class="math display">\[\frac{\partial
+                f}{\partial t} + \mathbf{u} \cdot \nabla f =
+                0\]</span></p>
+                <h3
+                id="dimensionless-parameters-and-defaults">Dimensionless
+                Parameters and Defaults</h3>
+                <p>The simulations are nondimensionalized with <span
+                class="math inline">\(\sigma = 1\)</span> and <span
+                class="math inline">\(\rho_1 = 1\)</span>. Key defaults
+                are:</p>
+                <table>
+                <thead>
+                <tr class="header">
+                <th>Parameter</th>
+                <th>Meaning</th>
+                <th>plateau-viscous</th>
+                <th>plateau-basilisk-website</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="odd">
+                <td><span
+                class="math inline">\(\rho_1/\rho_2\)</span></td>
+                <td>Density ratio</td>
+                <td>100</td>
+                <td>100</td>
+                </tr>
+                <tr class="even">
+                <td><span
+                class="math inline">\(\mu_1/\mu_2\)</span></td>
+                <td>Viscosity ratio</td>
+                <td>100</td>
+                <td>inviscid (default <span class="math inline">\(\mu =
+                0\)</span>)</td>
+                </tr>
+                <tr class="odd">
+                <td><span class="math inline">\(\sigma\)</span></td>
+                <td>Surface tension</td>
+                <td>1</td>
+                <td>1</td>
+                </tr>
+                <tr class="even">
+                <td><span class="math inline">\(R\)</span></td>
+                <td>Initial cylinder radius</td>
+                <td>0.2</td>
+                <td>0.2</td>
+                </tr>
+                <tr class="odd">
+                <td><span class="math inline">\(k\)</span></td>
+                <td>Perturbation wavenumber</td>
+                <td><span class="math inline">\(\pi\)</span></td>
+                <td><span class="math inline">\(\pi\)</span></td>
+                </tr>
+                <tr class="even">
+                <td><span class="math inline">\(A\)</span></td>
+                <td>Perturbation amplitude</td>
+                <td>0.1</td>
+                <td>0.1</td>
+                </tr>
+                <tr class="odd">
+                <td><code>maxlevel</code></td>
+                <td>Max AMR level</td>
+                <td>18</td>
+                <td>18</td>
+                </tr>
+                </tbody>
+                </table>
+                <h2 id="basilisk-required">Basilisk (Required)</h2>
+                <p>First-time install (or reinstall):</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-sL</span> https://raw.githubusercontent.com/comphy-lab/basilisk-C/main/reset_install_basilisk-ref-locked.sh <span class="kw">|</span> <span class="fu">bash</span> <span class="at">-s</span> <span class="at">--</span> <span class="at">--ref</span><span class="op">=</span>v2026-01-29 <span class="at">--hard</span></span></code></pre></div></div>
+                <p>Subsequent runs (reuses existing
+                <code>basilisk/</code> if same ref):</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-sL</span> https://raw.githubusercontent.com/comphy-lab/basilisk-C/main/reset_install_basilisk-ref-locked.sh <span class="kw">|</span> <span class="fu">bash</span> <span class="at">-s</span> <span class="at">--</span> <span class="at">--ref</span><span class="op">=</span>v2026-01-29</span></code></pre></div></div>
+                <blockquote>
+                <p>Note: Replace <code>v2026-01-29</code> with the
+                latest release tag from
+                https://github.com/comphy-lab/basilisk-C/releases.</p>
+                </blockquote>
+                <p>Set <code>BASILISK</code> to the Basilisk
+                <code>src</code> path and keep the Basilisk checkout
+                outside this repository:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .project_config (gitignored)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">BASILISK</span><span class="op">=</span>/path/to/basilisk/src</span></code></pre></div></div>
+                <p>You can also export <code>BASILISK</code> directly in
+                your shell.</p>
+                <h2 id="repository-structure">Repository Structure</h2>
+                <div class="code-block-container"><pre class="plaintext"><code>├── simulationCases/
+│   ├── plateau-basilisk-website.c
+│   ├── plateau-viscous.c
+│   ├── runCode.sh
+│   └── Makefile
+└── .github/                  Website assets and workflows</code></pre></div>
+                <p><code>src-local/</code> and <code>postProcess/</code>
+                are not present currently.</p>
+                <h2 id="running-the-code">Running the Code</h2>
+                <h3 id="using-scripts-recommended">Using Scripts
+                (Recommended)</h3>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> simulationCases</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># MPI run (4 ranks) using the default script</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./runCode.sh</span> plateau-viscous</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization build/run (single rank, OpenGL)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">./runCode.sh</span> <span class="at">--view</span> plateau-viscous</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Inviscid variant</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">./runCode.sh</span> plateau-basilisk-website</span></code></pre></div></div>
+                <p><code>runCode.sh</code> expects a
+                <code>.project_config</code> file in the repo root (used
+                to set <code>BASILISK</code>) and a working
+                <code>qcc</code>. The script defaults to
+                <code>plateau</code>; this repository does not include
+                <code>plateau.c</code>, so pass the case name
+                explicitly.</p>
+                <h3 id="manual-compilation">Manual Compilation</h3>
+                <p><strong>Basilisk Makefile (serial):</strong></p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-C</span> simulationCases plateau-viscous</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./simulationCases/plateau-viscous</span></span></code></pre></div></div>
+                <p>Note: <code>runCode.sh</code> creates
+                <code>simulationCases/&lt;case&gt;/</code> output
+                directories. In a clean clone,
+                <code>make -C simulationCases &lt;case&gt;</code> builds
+                an executable with the same name. If a directory with
+                that name already exists, prefer <code>runCode.sh</code>
+                or build into a different target name.</p>
+                <p><strong>Serial qcc:</strong></p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-O2</span> <span class="at">-Wall</span> <span class="at">-disable-dimensions</span> simulationCases/plateau-viscous.c <span class="at">-o</span> plateau-viscous <span class="at">-lm</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./plateau-viscous</span></span></code></pre></div></div>
+                <p><strong>OpenMP (shared memory):</strong></p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-O2</span> <span class="at">-Wall</span> <span class="at">-disable-dimensions</span> <span class="at">-fopenmp</span> simulationCases/plateau-viscous.c <span class="at">-o</span> plateau-viscous <span class="at">-lm</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">OMP_NUM_THREADS</span><span class="op">=</span>8</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">./plateau-viscous</span></span></code></pre></div></div>
+                <p><strong>MPI (distributed memory):</strong></p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="va">CC99</span><span class="op">=</span><span class="st">&#39;mpicc -std=c99&#39;</span> <span class="ex">qcc</span> <span class="at">-Wall</span> <span class="at">-O2</span> <span class="at">-D_MPI</span><span class="op">=</span>1 <span class="at">-disable-dimensions</span> simulationCases/plateau-viscous.c <span class="at">-o</span> plateau-viscous <span class="at">-lm</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mpirun</span> <span class="at">-np</span> 4 ./plateau-viscous</span></code></pre></div></div>
+                <p><strong>Visualization build (OpenGL):</strong></p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qcc</span> <span class="at">-O2</span> <span class="at">-Wall</span> <span class="at">-disable-dimensions</span> simulationCases/plateau-viscous.c <span class="at">-o</span> plateau-viscous <span class="at">-L</span><span class="va">$BASILISK</span>/gl <span class="at">-lglutils</span> <span class="at">-lfb_tiny</span> <span class="at">-lm</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./plateau-viscous</span></span></code></pre></div></div>
+                <h3 id="parameters-compile-time">Parameters
+                (Compile-Time)</h3>
+                <p>These cases use compile-time constants. Edit them in
+                the <code>.c</code> files and recompile:</p>
+                <table>
+                <thead>
+                <tr class="header">
+                <th>Parameter</th>
+                <th>Location</th>
+                <th>Description</th>
+                <th>Default</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="odd">
+                <td><code>maxlevel</code></td>
+                <td>plateau-*.c</td>
+                <td>Maximum AMR level</td>
+                <td>18</td>
+                </tr>
+                <tr class="even">
+                <td><code>R</code></td>
+                <td>plateau-*.c</td>
+                <td>Base radius</td>
+                <td>0.2</td>
+                </tr>
+                <tr class="odd">
+                <td><code>k</code></td>
+                <td>plateau-*.c</td>
+                <td>Perturbation wavenumber</td>
+                <td>pi</td>
+                </tr>
+                <tr class="even">
+                <td><code>A</code></td>
+                <td>plateau-*.c</td>
+                <td>Perturbation amplitude</td>
+                <td>0.1</td>
+                </tr>
+                <tr class="odd">
+                <td><code>rho1</code>, <code>rho2</code></td>
+                <td>plateau-*.c</td>
+                <td>Densities</td>
+                <td>1, 1e-2</td>
+                </tr>
+                <tr class="even">
+                <td><code>mu1</code>, <code>mu2</code></td>
+                <td>plateau-viscous.c</td>
+                <td>Viscosities</td>
+                <td>1e-2, 1e-4</td>
+                </tr>
+                <tr class="odd">
+                <td><code>sigma</code></td>
+                <td>plateau-*.c</td>
+                <td>Surface tension</td>
+                <td>1</td>
+                </tr>
+                </tbody>
+                </table>
+                <h3 id="hpc-cluster-execution">HPC Cluster
+                Execution</h3>
+                <p>Use your scheduler to launch the MPI binary, for
+                example:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">-n</span> 4 ./plateau-viscous</span></code></pre></div></div>
+                <h2 id="post-processing">Post-Processing</h2>
+                <p>Outputs are written in the run directory:</p>
+                <ul>
+                <li><code>prof-&lt;t&gt;</code>: interface profiles from
+                <code>output_facets</code></li>
+                <li><code>movie.mp4</code>: interface and mesh
+                visualization (when using <code>view.h</code>)</li>
+                <li><code>log</code>: time series of
+                <code>(t, r_min, u_max)</code> when you redirect
+                stderr</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./plateau-viscous</span> <span class="dv">2</span><span class="op">&gt;</span> log</span></code></pre></div></div>
+                <p>Use the gnuplot snippets in the case headers to fit
+                the scaling laws from <code>log</code>.</p>
+                <h2 id="citation">Citation</h2>
+                <p>If you use this code, please cite Basilisk and the
+                relevant pinch-off literature. Add paper and software
+                DOIs here when available.</p>
+                <h3 id="paper">Paper</h3>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bibtex"><code class="sourceCode bibtex"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="va">@article</span>{<span class="ot">TBD</span>,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span> = {TBD},</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span> = {TBD},</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">journal</span> = {TBD},</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span> = {TBD},</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">doi</span> = {TBD}</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div></div>
+                <h3 id="software">Software</h3>
+                <div class="code-block-container"><div class="code-block-container"><pre
+                class="sourceCode bibtex"><code class="sourceCode bibtex"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">@software{PinchOffTBD,</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">  title = {PinchOff: Plateau-Rayleigh pinch-off in Basilisk},</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">  author = {TBD},</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">  year = {2026},</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">  url = {https://github.com/&lt;org&gt;/&lt;repo&gt;},</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">  note = {Add Zenodo DOI when available}</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">}</span></span></code></pre></div></div>
+                <h2 id="authors">Authors</h2>
+                <ul>
+                <li>TBD (add authors and affiliations)</li>
+                </ul>
+                <h2 id="license">License</h2>
+                <p>No LICENSE file is included yet. Add a LICENSE file
+                to clarify reuse.</p>
+                <h2 id="generated-documentation">Generated
+                Documentation</h2>
+                <h3 id="simulationcases">simulationCases</h3>
+                <ul>
+                <li><a
+                href="simulationCases/Makefile.html">simulationCases/Makefile</a></li>
+                <li><a
+                href="simulationCases/plateau-basilisk-website.c.html">simulationCases/plateau-basilisk-website.c</a></li>
+                <li><a
+                href="simulationCases/plateau-viscous.c.html">simulationCases/plateau-viscous.c</a></li>
+                <li><a
+                href="simulationCases/runCode.sh.html">simulationCases/runCode.sh</a></li>
+                </ul>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-left">
+              <a href="https://basilisk.fr/sandbox/vatsal/" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/logos/logoBasilisk_TransparentBackground.png" alt="Basilisk C" class="footer-logo">
+              </a>
+              <a href="https://pof.tnw.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/logos/LogoPof_transparent_white.png" alt="Physics of Fluids" class="footer-logo pof-logo">
+              </a>
+              <a href="https://www.utwente.nl/" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/logos/UT_Logo_2400_Sta_White_EN.png" alt="University of Twente" class="footer-logo">
+              </a>
+              <a href="https://www.vatsalsanjay.com/" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/logos/Logo_Vatsal_v3_OutLine.png" alt="Vatsal Sanjay" class="footer-logo">
+              </a>
+            </div>
+            <div class="footer-center">
+              <p class="copyright-text">
+                &copy; Copyright<br>
+                CoMPhy Lab 2025
+              </p>
+            </div>
+            <div class="footer-right">
+              <!-- NOTE: Social media links below are organization-specific. Customize for your organization. -->
+              <a href="https://scholar.google.com/citations?user=tHb_qZoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar Profile">
+                <i class="ai ai-google-scholar" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab" target="_blank" rel="noopener noreferrer" aria-label="GitHub Organization">
+                <i class="fa-brands fa-github" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://www.youtube.com/@CoMPhyLab" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                <i class="fa-brands fa-youtube" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://x.com/VatsalSanjay" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter) Profile">
+                <i class="fa-brands fa-x-twitter" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://bsky.app/profile/comphy-lab.org" target="_blank" rel="noopener noreferrer" aria-label="Bluesky Profile">
+                <i class="fa-brands fa-bluesky" style="font-size: 2.5em; color: white;"></i>
+              </a>
+              <a href="https://github.com/comphy-lab/PinchOff" class="edit-link" aria-label="Edit this page on GitHub">
+                <i class="fa-brands fa-github"></i> View repository
+              </a>
+            </div>
+          </footer>
+    </div>  
+
+    <!-- Command Palette -->
+    <div id="simple-command-palette" class="simple-command-palette" style="display: none;">
+        <div class="simple-command-palette-backdrop"></div>
+        <div class="simple-command-palette-modal">
+            <input type="text" id="command-palette-input" placeholder="Type a command..." autocomplete="off">
+            <div id="command-palette-results" class="command-palette-results"></div>
+            <div class="command-palette-footer">
+                <span class="command-palette-footer-item"><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span class="command-palette-footer-item"><kbd>enter</kbd> to select</span>
+                <span class="command-palette-footer-item"><kbd>esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Add copy button to each code block container
+    const codeBlocks = document.querySelectorAll('.code-block-container pre');
+    codeBlocks.forEach(function(codeBlock, index) {
+        // Create button element
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.setAttribute('data-copy-state', 'copy');
+        
+        // Get the code block container (parent of the pre)
+        const container = codeBlock.parentNode;
+        
+        // Add the button to the container
+        container.appendChild(button);
+        
+        // Set up click event
+        button.addEventListener('click', async function() {
+            const codeText = codeBlock.textContent;
+            
+            try {
+                // Try to use the modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(codeText);
+                    updateButtonState(button, 'success');
+                } else {
+                    // Fall back to the deprecated execCommand method
+                    const textarea = document.createElement('textarea');
+                    textarea.value = codeText;
+                    textarea.style.position = 'fixed';  // Prevent scrolling to the bottom
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        updateButtonState(button, 'success');
+                    } else {
+                        updateButtonState(button, 'error');
+                    }
+                }
+            } catch (err) {
+                console.error('Copy failed:', err);
+                updateButtonState(button, 'error');
+            }
+        });
+    });
+    
+    // Function to update button state
+    function updateButtonState(button, state) {
+        if (state === 'success') {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+        } else if (state === 'error') {
+            button.textContent = 'Error!';
+            button.classList.add('error');
+        }
+        
+        // Reset button state after 2 seconds
+        setTimeout(function() {
+            button.textContent = 'Copy';
+            button.classList.remove('copied', 'error');
+        }, 2000);
+    }
+});
+</script>
+        </body>
+</html>
