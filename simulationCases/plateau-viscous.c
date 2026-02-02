@@ -1,20 +1,40 @@
 /**
-# Scalings for Plateau–Rayleigh pinchoff
+# Plateau-Rayleigh Pinch-Off (Viscous)
 
-An inviscid cylinder of dense liquid is unstable under surface
-tension forces. The initial growth of the perturbation is described
-by the Rayleigh--Plateau linear stability theory. Close to pinchoff,
-non-linear effects cannot be neglected and fully non-linear
-solutions must be sought. Using simple similarity arguments, one can
-predict that the minimum radius of the deformed cylinder should tend
-toward zero as $(t_0-t)^{2/3}$ while the axial velocity should
-diverge as $1/(t_0-t)^{1/3}$, with $t_0$ the time of pinchoff.
+Axisymmetric simulation of the Rayleigh-Plateau instability with finite viscosity.
+This case reproduces the universal similarity scalings for pinch-off dynamics:
+minimum radius $r_{\min} \sim (t_0 - t)^{2/3}$ and maximum velocity
+$u_{\max} \sim (t_0 - t)^{-1/3}$, where $t_0$ is the pinch-off time.
 
-This test case verifies that these scalings can be recovered using
-an axisymmetric VOF calculation.
+## Author
+Vatsal Sanjay
+Email: vatsalsy@comphy-lab.org
+Computational Multiphase Physics Lab
+Last updated: Jan 30, 2026
 
-The figure below illustrates the initial growth, pinchoff and
-satellite drop formation.
+## Physical Setup
+
+A liquid cylinder of radius $R = 0.2$ is perturbed sinusoidally with wavenumber
+$k = \pi$ and amplitude $A = 0.1$. Surface tension drives the Rayleigh-Plateau
+instability, leading to necking, pinch-off, and satellite drop formation.
+
+The initial perturbation is:
+
+$$r(x, t=0) = R(1 + A \sin(kx))$$
+
+This viscous variant includes finite viscosity ratio $\mu_1/\mu_2 = 100$ and
+density ratio $\rho_1/\rho_2 = 100$.
+
+## Similarity Scalings
+
+Using similarity arguments, the minimum radius and maximum axial velocity near
+pinch-off follow power laws:
+
+- Minimum radius: $r_{\min} \sim (t_0 - t)^{2/3}$
+- Maximum velocity: $u_{\max} \sim (t_0 - t)^{-1/3}$
+
+The figures below illustrate the initial growth, pinch-off, and satellite drop
+formation.
 
 ~~~gnuplot Interfaces at times 0.2, 0.6, breakup and 0.8
 set size ratio -1
@@ -28,20 +48,15 @@ plot for [j=1:4] for [x0=0:2:2] for [i=-1:1:2] 'prof-'.q[j] u (x0+$1):(i*$2 - s[
      for [j=1:4] for [x0=0:2:2] for [i=-1:1:2] 'prof-'.q[j] u (x0+1-$1):(i*$2 - s[j]) w l lc -1
 ~~~
 
-The animation below shows how adaptivity is used to track the high
-curvatures and short timescales close to pinchoff. Up to 18 levels of
-refinement are used to capture roughly four orders of magnitude in
-characteristic spatial scales.
+The animation shows how adaptive mesh refinement tracks high curvatures and short
+timescales near pinch-off. Up to 18 levels of refinement capture roughly four
+orders of magnitude in spatial scales.
 
 ![Mesh and interface evolution](plateau/movie.mp4)(width="80%")
 
-The scalings for the minimum radius and maximum velocity are given
-in the figures below, together with the
-theoretical fits. The fit is excellent for at least four orders of
-magnitude in timescale. The departures from the power laws close to
-pinchoff are due to saturation of the spatial resolution (the
-minimum value on the y-axis of the first figure is the grid size
-$1/2^{18}$).
+The scaling plots below show the theoretical fits. The fit is excellent over
+at least four orders of magnitude. Departures from power laws near pinch-off
+result from saturation of spatial resolution (grid size $1/2^{18}$).
 
 ~~~gnuplot Evolution of the minimum radius
 reset
@@ -64,56 +79,89 @@ fit [1e-7:1e-3] a*x**(-1./3.) 'log' u (t0 - $1):3 via a
 plot [1e-8:]'log' u (t0 - $1):3 ps 0.5 t '', a*x**(-1./3.) t 'x^{-1/3}'
 ~~~
 
-For a more detailed description see [Popinet, 2009](/sandbox/popinet/README#popinet2009) and
-[Popinet & Antkowiak, 2011](/sandbox/popinet/README#popinet2011d).
+## References
 
-## Setup
+For detailed description see:
+- [Popinet, 2009](/sandbox/popinet/README#popinet2009)
+- [Popinet & Antkowiak, 2011](/sandbox/popinet/README#popinet2011d)
 
-We solve the axisymmetric, incompressible, variable-density,
-Navier--Stokes equations with two phases and surface tension. */
+## Numerical Setup
+
+We solve the axisymmetric, incompressible, variable-density Navier-Stokes
+equations with two phases and surface tension.
+*/
 
 #include "axi.h"
 #include "navier-stokes/centered.h"
 #include "two-phase.h"
 #include "tension.h"
 
+/**
+## Parameters
+
+Maximum refinement level for adaptive mesh.
+*/
 const int maxlevel = 18;
 
+/**
+## Main Function
+
+Initialize domain, material properties, and run the simulation.
+*/
 int main()
 {
   origin (-0.5);
+  
+  /**
+  Surface tension coefficient.
+  */
   f.sigma = 1.;
+  
+  /**
+  Phase densities: $\rho_1 = 1$, $\rho_2 = 0.01$ (density ratio 100).
+  */
   rho1 = 1.;
   rho2 = 1e-2;
 
   /**
-  We consider the inviscid case. Viscosity could be added easily with
-  something like: */
-
-  mu1 = 1e-2, mu2 = 1e-4;
+  Phase viscosities: $\mu_1 = 0.01$, $\mu_2 = 0.0001$ (viscosity ratio 100).
+  This distinguishes the viscous case from the inviscid variant.
+  */
+  mu1 = 1e-2;
+  mu2 = 1e-4;
 
   run();
 }
 
 /**
-The initial conditions are a perturbed cylinder with a relatively
-large amplitude of deformation (10%). */
+## Initial Conditions
 
-event init (t = 0) {
+Perturbed cylinder with 10% amplitude sinusoidal deformation.
+*/
+event init (t = 0)
+{
+  /**
+  Perturbation parameters: wavenumber $k = \pi$, base radius $R = 0.2$,
+  amplitude $A = 0.1$.
+  */
   double k = pi, R = 0.2;
   fraction (f, R*(1. + 0.1*sin(k*x)) - y);
 }
 
 /**
-We allocate a field which will be used to store the position of the
-interface relative to the axis of symmetry. */
+## Diagnostics
 
+Allocate scalar field `Y` to store the radial position of the interface
+relative to the axis of symmetry.
+*/
 scalar Y[];
 
 /**
-We log the minimum of this position as a function of time as well as
-the maximum axial velocity. */
+### Logging
 
+Log the minimum interface position and maximum axial velocity at regular
+intervals. Output is written to stderr and can be redirected to a log file.
+*/
 event logfile (i += 5)
 {
   position (f, Y, {0,1});
@@ -121,10 +169,17 @@ event logfile (i += 5)
 }
 
 /**
-We generate interface profiles and an animation. */
+## Output
 
+Generate interface profiles and animation for visualization.
+*/
 const double tpinch = 0.75626;
 
+/**
+### Interface Profiles
+
+Write interface facet coordinates at specific times.
+*/
 event profiles (t = {0.2, 0.6, tpinch, 0.8})
 {
   char name[80];
@@ -134,6 +189,11 @@ event profiles (t = {0.2, 0.6, tpinch, 0.8})
   fclose (fp);
 }
 
+/**
+### Animation
+
+Generate movie showing mesh refinement and interface evolution.
+*/
 #include "view.h"
 
 event movie (t = 0.6; i += 5; t <= tpinch)
@@ -151,40 +211,40 @@ event movie (t = 0.6; i += 5; t <= tpinch)
 }
 
 /**
-The mesh is adapted "manually" so that the axisymmetric radius of
-deformation of the interface is alway described by at least 5 grid
-points, down to a maximum level of refinement of maxlevel. */
+## Adaptive Mesh Refinement
 
+Refine the mesh to maintain at least 5 grid cells across the local interface
+radius, up to `maxlevel` before breakup and level 10 after.
+*/
 event adapt (i++)
 {
-
   /**
-  We check whether the column is broken. */
-
+  Check whether the column is broken (minimum radius below grid resolution).
+  */
   position (f, Y, {0,1});
   static bool broken = false;
   if (!broken)
     broken = statsf(Y).min < 1./(1 << maxlevel);
 
   /**
-  The refinement uses maxlevel levels before breakup and 10 after. */
-
+  Refine cells containing the interface to ensure 5 cells per local radius.
+  */
   const double eps = 1e-6;
   refine (level < (broken ? 10 : maxlevel) &&
 	  f[] > eps && f[] < 1. - eps &&
 	  Delta > Y[]/5.);
 
   /**
-  Cells which do not contain the interface (or which are at a level
-  larger than 10 after breakup) are "unrefined". */
-
+  Unrefine cells that do not contain the interface or exceed the post-breakup
+  refinement level.
+  */
   unrefine (f[] <= eps || f[] >= 1. - eps ||
 	    (broken && level > 10));
 }
 
 /**
-## See also
+## See Also
 
-* [Same test with Gerris](http://gerris.dalembert.upmc.fr/gerris/tests/tests/plateau.html)
-* [3D plateau example with Gerris](http://gerris.dalembert.upmc.fr/gerris/examples/examples/plateau.html)
+- [Same test with Gerris](http://gerris.dalembert.upmc.fr/gerris/tests/tests/plateau.html)
+- [3D Plateau example with Gerris](http://gerris.dalembert.upmc.fr/gerris/examples/examples/plateau.html)
 */
