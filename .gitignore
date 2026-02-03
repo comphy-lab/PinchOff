@@ -9,10 +9,9 @@ CLAUDE.md
 **/*.tags*
 **/*.deps
 **/*.tests
-**/*.s*
+**/*.s
 **/Video
 **/*.mp4
-**/*.json
 **/*.bv
 
 # Simulation outputs
