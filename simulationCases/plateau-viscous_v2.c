@@ -1,5 +1,11 @@
 /** 
 # Viscous Plateau-Rayleigh Pinchoff
+## Author
+Saumili Jana
+Email: s.jana@utwente.n;
+Computational Multiphase Physics Lab
+Last updated: Mar 7, 2026
+
 
 This case contains the code for axisymmetric simulation of the Rayleigh-Plateau instability with finite viscosity.
 For very small viscosities the universal similarity scalings for pinch-off dynamics are reproduced:
