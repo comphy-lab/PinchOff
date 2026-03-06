@@ -6,9 +6,10 @@
 
 PinchOff provides axisymmetric two-phase VOF simulations of the Rayleigh-Plateau instability and pinch-off dynamics of a liquid cylinder. The code reproduces the universal similarity scalings $r_{\min} \sim (t_0 - t)^{2/3}$ and $u_{\max} \sim (t_0 - t)^{-1/3}$ using adaptive mesh refinement and interface tracking with the Basilisk C framework.
 
-Two simulation variants are included:
+Three simulation variants are included:
 - `plateau-basilisk-website.c` — inviscid reference case (matches [Basilisk tutorial](http://basilisk.fr/src/examples/plateau.c))
-- `plateau-viscous.c` — viscous extension with finite viscosity ratio
+- `plateau-viscous.c` — viscous extension with finite viscosity ratio using manual mesh refinement approach similar to the Basilisk tutorial.
+- `plateau-viscous_v2.c` — viscous extension with finite viscosity ratio, using the adapt wavelength approach for mesh refinement. The maximum refinement level increases with time as the filament thins before pinhoff.
 
 **Background references**: Popinet (2009), Popinet & Antkowiak (2011)
 
