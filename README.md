@@ -9,7 +9,7 @@ PinchOff provides axisymmetric two-phase VOF simulations of the Rayleigh-Plateau
 Three simulation variants are included:
 - `plateau-basilisk-website.c` — inviscid reference case (matches [Basilisk tutorial](http://basilisk.fr/src/examples/plateau.c))
 - `plateau-viscous.c` — viscous extension with finite viscosity ratio using manual mesh refinement approach similar to the Basilisk tutorial.
-- `plateau-viscous_v2.c` — viscous extension with finite viscosity ratio, using the adapt wavelength approach for mesh refinement. The maximum refinement level increases with time as the filament thins before pinhoff.
+- `plateau-viscous_v2.c` — viscous extension with finite viscosity ratio, using the adapt wavelet approach for mesh refinement. The maximum refinement level increases with time as the filament thins before pinhoff.
 
 **Background references**: Popinet (2009), Popinet & Antkowiak (2011)
 
